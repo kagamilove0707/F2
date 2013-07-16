@@ -2,8 +2,9 @@
 
 module Parser (parse) where
 
-import Text.Peggy (space, defaultDelimiter, peggy, parseString, ParseError)
+import Text.Peggy (space, defaultDelimiter, peggy, parseString)
 import DataType
+import Util
 
 [peggy|
 top :: AST
@@ -51,5 +52,5 @@ op ::: String
 
 parse :: String -> Either String AST
 parse src = case parseString top "<source>" src of
-  Left x -> Left $ show x
+  Left x -> Left $ showParseError x
   Right x -> Right x

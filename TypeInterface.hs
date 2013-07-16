@@ -15,12 +15,12 @@ unify eqs = solve eqs []
    |otherwise = case (t1, t2) of
      (TFun t11 t12, TFun t21 t22) -> solve ((t11, t21):(t12, t22):eqs) th
      (TVar s, _)
-      |occurs t1 t2 -> Left "Occurs miss"
+      |occurs t1 t2 -> Left "type error : occurs miss"
       |otherwise -> solve (substEq [(s, t2)] eqs) (composeSubst [(s, t2)] th)
      (_, TVar s)
-      |occurs t2 t1 -> Left "Occurs miss"
+      |occurs t2 t1 -> Left "type error : occurs miss"
       |otherwise -> solve (substEq [(s, t1)] eqs) (composeSubst [(s, t1)] th)
-     (_, _) -> Left "No match"
+     (_, _) -> Left "type error : no match"
 
 occurs :: Type -> Type -> Bool
 occurs t1 (TFun t21 t22) = occurs t1 t21 || occurs t1 t22
@@ -67,7 +67,7 @@ tinf' env (IntLit _) = return (env, TInt, [])
 tinf' env (BoolLit _) = return (env, TBool, [])
 tinf' env (Var s) = case lookup s env of
   Just t -> return (env, t, [])
-  Nothing -> lift $ Left $ "Not found \"" ++ s ++ "\""
+  Nothing -> lift $ Left $ "type error : not found \"" ++ s ++ "\""
 tinf' env (Fun s e) = do
   tv <- newTVar
   let env' = (s, tv):env
@@ -108,4 +108,4 @@ tinf' env (Tuple (e1, e2)) = do
   (env2, t2, th2) <- tinf' env1 e2
   return (env1, TTuple (t1, t2), composeSubst th2 th1)
 
-tinf env e = evalStateT (tinf' env e) 0
+tinf env e = runStateT (tinf' env e)

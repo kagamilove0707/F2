@@ -25,7 +25,14 @@ data Type
   | TBool
   | TTuple (Type, Type)
   | TVar Name
-  | TFun Type Type deriving (Show, Eq)
+  | TFun Type Type deriving (Eq)
+
+instance Show Type where
+  show TInt = "Int"
+  show TBool = "Bool"
+  show (TTuple (t1, t2)) = "(" ++ show t1 ++ ", " ++ show t2 ++ ")"
+  show (TVar s) = s
+  show (TFun t1 t2) = show t1 ++ " -> " ++ show t2
 
 data Value
   = VInt Integer

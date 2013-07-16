@@ -1,4 +1,6 @@
-module F2 (exec, execPrelude, preludeEnv) where
+module F2 (
+  exec, execPrelude, preludeEnv,
+  module DataType) where
 
 import DataType
 import Parser
@@ -17,14 +19,14 @@ preludeEnv = [
   ("+", ((TFun TInt (TFun TInt TInt)),
           (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x + y))))))]
 
-exec :: Env -> String -> Either String (Type, Value)
-exec env src = do
+exec :: Int -> Env -> String -> Either String (Type, Value, Int)
+exec n env src = do
   ast <- parse src
-  (_, t, _) <- tinf (toTyEnv env) ast
+  ((_, t, _), m) <- tinf (toTyEnv env) ast n
   v <- eval (toVEnv env) ast
-  return (t, v)
+  return (t, v, m)
 
-execPrelude = exec preludeEnv
+execPrelude = exec 0 preludeEnv
 
 toTyEnv = map (\(s, (t, _))-> (s, t))
 toVEnv = map (\(s, (_, v))-> (s, v))
