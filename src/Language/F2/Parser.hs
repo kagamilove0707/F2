@@ -1,10 +1,10 @@
 {-# Language TemplateHaskell, QuasiQuotes, FlexibleContexts #-}
 
-module Parser (parse) where
+module Language.F2.Parser (parse) where
 
 import Text.Peggy (defaultDelimiter, peggy, parseString)
-import DataType
-import Util
+import Language.F2.DataType
+import Language.F2.Util
 
 [peggy|
 space :: ()

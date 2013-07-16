@@ -1,11 +1,11 @@
-module F2 (
+module Language.F2 (
   exec, execPrelude, preludeEnv, version,
-  module DataType) where
+  module Language.F2.DataType) where
 
-import DataType
-import Parser
-import TypeInterface
-import Eval
+import Language.F2.DataType
+import Language.F2.Parser
+import Language.F2.TypeInterface
+import Language.F2.Eval
 
 import Control.Monad.Error
 

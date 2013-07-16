@@ -1,8 +1,8 @@
-module TypeInterface (
+module Language.F2.TypeInterface (
   tinf', tinf, unify
   ) where
 
-import DataType
+import Language.F2.DataType
 import Control.Monad.Error
 import Control.Monad.State
 

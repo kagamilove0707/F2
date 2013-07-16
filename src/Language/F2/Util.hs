@@ -1,4 +1,4 @@
-module Util (showParseError) where
+module Language.F2.Util (showParseError) where
 
 import Text.Peggy
 

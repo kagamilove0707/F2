@@ -2,8 +2,8 @@
 
 module Main where
 
-import F2
-import Util
+import Language.F2
+import Language.F2.Util
 import System.IO (hFlush, stdout)
 import Control.Arrow (first, second, (>>>))
 import Control.Monad.State

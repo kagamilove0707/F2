@@ -1,4 +1,4 @@
-module DataType (
+module Language.F2.DataType (
   Name,
   AST (..),
   Type (..),

@@ -1,6 +1,6 @@
-module Eval (eval) where
+module Language.F2.Eval (eval) where
 
-import DataType
+import Language.F2.DataType
 import Control.Monad.Error
 import Control.Monad.State
 
