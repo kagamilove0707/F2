@@ -62,11 +62,30 @@ remove s ((s', t):st)
  | s == s' = st
  | otherwise = (s', t) : remove s st
 
+incrTy :: Type -> StateT Int (Either String) Type
+incrTy (TFun t1 t2) = do
+  t1' <- incrTy t1
+  t2' <- incrTy t2
+  return $ TFun t1' t2'
+incrTy (TTuple (t1, t2)) = do
+  t1' <- incrTy t1
+  t2' <- incrTy t2
+  return $ TTuple (t1', t2')
+incrTy TInt = return TInt
+incrTy TBool = return TBool
+incrTy (TVar s) = do
+  i <- get
+  return $ TVar $ s ++ "_" ++ show i
+
 tinf' :: TyEnv -> AST -> StateT Int (Either String) (TyEnv, Type, TySubst)
 tinf' env (IntLit _) = return (env, TInt, [])
 tinf' env (BoolLit _) = return (env, TBool, [])
 tinf' env (Var s) = case lookup s env of
-  Just t -> return (env, t, [])
+  Just t@(TVar _) -> return (env, t, [])
+  Just t -> do
+    t' <- incrTy t
+    modify (+ 1)
+    return (env, t', [])
   Nothing -> lift $ Left $ "type error : not found \"" ++ s ++ "\""
 tinf' env (Fun s e) = do
   tv <- newTVar

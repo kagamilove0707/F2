@@ -38,6 +38,7 @@ value :: AST
 
 intValue ::: Integer
   = [1-9] [0-9]* { read ($1 : $2) }
+  / '0' { 0 }
 
 boolValue ::: Bool
   = "True" { True }
