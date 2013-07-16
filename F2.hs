@@ -19,14 +19,14 @@ preludeEnv = [
   ("+", ((TFun TInt (TFun TInt TInt)),
           (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x + y))))))]
 
-exec :: Int -> Env -> String -> Either String (Type, Value, Int)
-exec n env src = do
+exec :: Env -> String -> Either String (Type, Value)
+exec env src = do
   ast <- parse src
-  ((_, t, _), m) <- tinf (toTyEnv env) ast n
+  (_, t, _) <- tinf (toTyEnv env) ast
   v <- eval (toVEnv env) ast
-  return (t, v, m)
+  return (t, v)
 
-execPrelude = exec 0 preludeEnv
+execPrelude = exec preludeEnv
 
 toTyEnv = map (\(s, (t, _))-> (s, t))
 toVEnv = map (\(s, (_, v))-> (s, v))

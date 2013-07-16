@@ -127,4 +127,4 @@ tinf' env (Tuple (e1, e2)) = do
   (env2, t2, th2) <- tinf' env1 e2
   return (env1, TTuple (t1, t2), composeSubst th2 th1)
 
-tinf env e = runStateT (tinf' env e)
+tinf env e = evalStateT (tinf' env e) 0

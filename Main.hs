@@ -32,11 +32,11 @@ op ::: String
   = [+\-*/<>=:^~#$-]+
 |]
 
-main = runStateT mainloop ((1,0), preludeEnv)
+main = runStateT mainloop (1, preludeEnv)
 
-mainloop :: StateT ((Int, Int), Env) IO ()
+mainloop :: StateT (Int, Env) IO ()
 mainloop = do
-  ((n, m), env) <- get
+  (n, env) <- get
   lift $ putStr $ "(" ++ show n ++ ")# "
   lift $ hFlush stdout
   line <- lift $ getLine
@@ -45,10 +45,10 @@ mainloop = do
   else do
     case parseString top "<source>" line of
       Left e -> lift $ putStrLn $ "  parse error : " ++ showParseError e
-      Right (name, x) -> case exec m env x of
+      Right (name, x) -> case exec env x of
         Left e -> lift $ putStrLn $ "  " ++ e
-        Right (t, v, m) -> do
-          modify (second ((name, (t, v)):) >>> first (second (const m)))
+        Right (t, v) -> do
+          modify (second ((name, (t, v)):))
           lift $ putStrLn $ "  " ++ name ++ " = " ++ x ++ " = " ++ show v ++ " : " ++ show t
-    modify (first $ first (+ 1))
+    modify (first (+ 1))
     mainloop
