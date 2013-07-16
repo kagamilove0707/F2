@@ -2,11 +2,17 @@
 
 module Parser (parse) where
 
-import Text.Peggy (space, defaultDelimiter, peggy, parseString)
+import Text.Peggy (defaultDelimiter, peggy, parseString)
 import DataType
 import Util
 
 [peggy|
+space :: ()
+  = [ \r\n\t] { () } / comment { () }
+
+comment :: ()
+  = '{-' (space / (!"-}" . { () }))* '-}' { () }
+
 top :: AST
   = expr !.
 

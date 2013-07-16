@@ -7,9 +7,15 @@ import Util
 import System.IO (hFlush, stdout)
 import Control.Arrow (first, second, (>>>))
 import Control.Monad.State
-import Text.Peggy (space, defaultDelimiter, peggy, parseString)
+import Text.Peggy (defaultDelimiter, peggy, parseString)
 
 [peggy|
+space :: ()
+  = [ \r\n\t] { () } / comment { () }
+
+comment :: ()
+  = '{-' (space / (!"-}" . { () }))* '-}' { () }
+
 
 top :: (String, String)
   = expr !.
