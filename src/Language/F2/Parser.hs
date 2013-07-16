@@ -82,5 +82,5 @@ op ::: String
 
 parse :: String -> Either String AST
 parse src = case parseString top "<source>" src of
-  Left x -> Left $ showParseError x
+  Left x -> Left $ "parse error : " ++ showParseError x
   Right x -> Right x

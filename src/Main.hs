@@ -49,6 +49,9 @@ mainloop = do
   line <- lift $ getLine
   if line == ":q" then do
     lift $ putStrLn "\n  See you!!"
+  else if line == ":v" then do
+    lift $ putStrLn "  version " ++ version
+    mainloop
   else do
     case parseString top "<source>" line of
       Left e -> lift $ putStrLn $ "  parse error : " ++ showParseError e
