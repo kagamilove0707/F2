@@ -11,6 +11,16 @@ eval' (Let s e1 e2) = do
   v2 <- eval' e2
   modify tail
   return v2
+eval' (LetRec s e1 e2) = do
+  v1 <- eval' e1
+  case v1 of
+    VFun env e -> do
+      let fn = VFun ((s, fn):env) e
+      modify ((s,fn):)
+    _ -> modify ((s, v1):)
+  v2 <- eval' e2
+  modify tail
+  return v2
 eval' fn@(Fun s e) = do
   env <- get
   return $ VFun env fn

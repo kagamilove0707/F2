@@ -120,8 +120,8 @@ tinf' env (If c e1 e2) = do
 tinf' env (Let s e1 e2) = do
   (env', t1, th1) <- tinf' env e1
   let env'' = (s, t1):env'
-  (env'', t2, th2) <- tinf' env'' e2
-  return (remove s env'', t2, composeSubst th2 th1)
+  (env''', t2, th2) <- tinf' env'' e2
+  return (remove s env''', t2, composeSubst th2 th1)
 tinf' env (Tuple (e1, e2)) = do
   (env1, t1, th1) <- tinf' env  e1
   (env2, t2, th2) <- tinf' env1 e2
@@ -131,5 +131,13 @@ tinf' env (Sig ast t) = do
   th2 <- lift $ unify [(t1, t)]
   let t1' = substTy th2 t
   return (env', t1', composeSubst th2 th1)
+tinf' env (LetRec s e1 e2) = do
+  tv1 <- newTVar
+  let env' = (s, tv1):env
+  (env'', t1', th1) <- tinf' env' e1
+  th1' <- lift $ unify [(t1', tv1)]
+  let env2 = substTyEnv th1' env''
+  (env2', t2, th2) <- tinf' env2 e2
+  return (remove s env2', t2, composeSubst th1' th2)
 
 tinf env e = evalStateT (tinf' env e) 0

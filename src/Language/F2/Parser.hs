@@ -10,6 +10,9 @@ import Language.F2.Util
 space :: ()
   = [ \r\n\t] { () } / comment { () }
 
+delimiter :: ()
+  = [()[\]<>;:,.+*/<>=:^~#$-] { () }
+
 comment :: ()
   = '{-' (space / (!"-}" . { () }))* '-}' { () }
 
@@ -17,11 +20,15 @@ top :: AST
   = expr !.
 
 expr :: AST
-  = letExpr / funExpr / ifExpr / appExpr
+  = letrecExpr / letExpr / funExpr / ifExpr / appExpr
 
 letExpr :: AST
   = "let" name "=" expr "in" expr { Let $1 $2 $3 }
   / "let" "(" op ")" "=" expr "in" expr { Let $1 $2 $3 }
+
+letrecExpr :: AST
+  = "let" "rec" name "=" funExpr "in" expr { LetRec $1 $2 $3 }
+  / "let" "rec" "(" op ")" "=" expr "in" funExpr { LetRec $1 $2 $3 }
 
 funExpr :: AST
   = "fun" name+ "->" expr { foldr (\a e->Fun a e) $2 $1 }
@@ -66,10 +73,11 @@ boolValue ::: Bool
   / "False" { False }
 
 name ::: String
-  = !"fun" !"in" !"let" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9]* { $1 : $2 }
+  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9~']* { $1 : $2 }
+  / '~' [a-zA-Z~']* { '~' : $1 }
 
 op ::: String
-  = [+\-*/<>=:^~#$-]+
+  = [.+\-*/<>=:^#$-]+
 |]
 
 parse :: String -> Either String AST

@@ -19,6 +19,7 @@ data AST
   | App AST AST
   | If AST AST AST
   | Let Name AST AST
+  | LetRec Name AST AST
   | Sig AST Type deriving (Show)
 
 data Type

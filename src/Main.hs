@@ -31,7 +31,7 @@ otherExpr :: String
   = .+
 
 name ::: String
-  = !"fun" !"in" !"let" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9]* { $1 : $2 }
+  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_~] [a-zA-Z0-9~']* { $1 : $2 }
 
 op ::: String
   = [+\-*/<>=:^~#$-]+

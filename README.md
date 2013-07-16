@@ -29,7 +29,7 @@ MLが七割、Haskellが三割入ったような変な仕様となっていま�
 
 ```
 $ ./f2
-hello. F2 v0.1.0 (2013/07/13)
+hello. F2 v0.1.1.2 (2013/07/17)
 
 (1)#
 ```
@@ -75,7 +75,7 @@ hello. F2 v0.1.0 (2013/07/13)
   const = fun x y -> x = <fun> : 't0 -> t1' -> t0'
 (8)# let f = const 10 in f 20
   it = let f = const 10 in 20 = 10 : Int
-(9)# let x = 10 in if x = 20 then 1 else 2
+(9)# let x = 10 in if x == 20 then 1 else 2
   it = let x = 10 in if x = 20 then 1 else 2 = 2 : Int
 (10)# def (&&) = fun x y -> if x then y else False
   && = fun x y -> if x then y else False = <fun> : Bool -> Bool -> Bool
@@ -97,9 +97,9 @@ hello. F2 v0.1.0 (2013/07/13)
 
   * `id : 'a -> 'a`
   * `(+) : Int -> Int -> Int`
-  * `(=) : Int -> Int -> Bool`
+  * `(==) : Int -> Int -> Bool`
 
-`(=)`が`Int`にしか適用できないのは、型クラスを持たないせいです(´･ω･`)
+`(==)`が`Int`にしか適用できないのは、型クラスを持たないせいです(´･ω･`)
 
 ##とぅどぅー
 
