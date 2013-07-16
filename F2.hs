@@ -9,7 +9,7 @@ import Eval
 
 import Control.Monad.Error
 
-version = "0.1.0 (2013/07/16)"
+version = "0.1.1 (2013/07/17)"
 
 defaultEnv :: Env
 defaultEnv = []

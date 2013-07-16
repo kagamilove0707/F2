@@ -16,7 +16,6 @@ space :: ()
 comment :: ()
   = '{-' (space / (!"-}" . { () }))* '-}' { () }
 
-
 top :: (String, String)
   = expr !.
 
