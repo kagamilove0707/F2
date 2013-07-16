@@ -11,14 +11,14 @@
 
 ##インストール
 
-Peggyやcategory-extraなどのパッケージに依存しているはずです(｀・ω・´)　今度きちんと依存関係を調べておきますです(´･ω･｀)
+Cabalを使ってのインストールに対応しましたですー＞ω＜
 
 ```
 $ git clone git@github.com:kagamilove0707/F2.git && cd F2
-$ ghc Main.hs -o f2
+$ cabal configure && cabal build
 ```
 
-（cabalなどを使って、もっと優雅に管理したいものです＞＜）
+これで、依存関係に足りないものがあっても勝手にインストールされるはずですー＞ω＜
 
 ##実行
 
@@ -71,7 +71,7 @@ hello. F2 v0.1.0 (2013/07/13)
 他にはlet式（`let 名前 = 式1 in 式2`）で束縛したり、if式（`if 条件 then 式1 else 式2`）で分岐したり、カリー化したり、型シグネチャを指定したりできますです＞ω＜
 
 ```
-(7)# def const = fun x y -> x
+(7)# def const = fun x y -> x {- コメントはHaskell風ですー＞ω＜ -}
   const = fun x y -> x = <fun> : 't0 -> t1' -> t0'
 (8)# let f = const 10 in f 20
   it = let f = const 10 in 20 = 10 : Int
