@@ -30,11 +30,26 @@ appExpr :: AST
 
 value :: AST
   = "(" expr ")"
+  / "(" expr ":" sig ")" { Sig $1 $2 }
   / "(" expr "," expr ")" { Tuple ($1, $2) }
   / "(" op ")" { Var $1 }
   / intValue { IntLit $1 }
   / boolValue { BoolLit $1 }
   / name { Var $1 }
+
+sig :: Type
+  = sigPrim "->" sig { TFun $1 $2 }
+  / sigPrim
+
+sigPrim :: Type
+  = "(" sig ")"
+  / "(" sig "," sig ")" { TTuple ($1, $2) }
+  / "Int" { TInt }
+  / "Bool" { TBool }
+  / '\'' sigName { TVar ('\'' : $1) }
+
+sigName :: String
+  = [a-z] [a-zA-Z]* { $1 : $2 }
 
 intValue ::: Integer
   = [1-9] [0-9]* { read ($1 : $2) }

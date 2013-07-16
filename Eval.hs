@@ -40,6 +40,7 @@ eval' (Var s) = do
     Just v -> return v
 eval' (IntLit x) = return $ VInt x
 eval' (BoolLit x) = return $ VBool x
+eval' (Sig ast _) = eval' ast
 
 eval :: VEnv -> AST -> Either String Value
 eval env ast = evalStateT (eval' ast) env

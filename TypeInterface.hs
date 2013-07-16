@@ -126,5 +126,10 @@ tinf' env (Tuple (e1, e2)) = do
   (env1, t1, th1) <- tinf' env  e1
   (env2, t2, th2) <- tinf' env1 e2
   return (env1, TTuple (t1, t2), composeSubst th2 th1)
+tinf' env (Sig ast t) = do
+  (env', t1, th1) <- tinf' env ast
+  th2 <- lift $ unify [(t1, t)]
+  let t1' = substTy th2 t
+  return (env', t1', composeSubst th2 th1)
 
 tinf env e = evalStateT (tinf' env e) 0

@@ -18,7 +18,8 @@ data AST
   | Fun Name AST
   | App AST AST
   | If AST AST AST
-  | Let Name AST AST deriving (Show)
+  | Let Name AST AST
+  | Sig AST Type deriving (Show)
 
 data Type
   = TInt
