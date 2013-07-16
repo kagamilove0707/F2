@@ -1,5 +1,5 @@
 module F2 (
-  exec, execPrelude, preludeEnv,
+  exec, execPrelude, preludeEnv, version,
   module DataType) where
 
 import DataType
@@ -9,6 +9,8 @@ import Eval
 
 import Control.Monad.Error
 
+version = "0.1.0 (2013/07/16)"
+
 defaultEnv :: Env
 defaultEnv = []
 
@@ -17,7 +19,9 @@ preludeEnv = [
   ("id", ((TFun (TVar "'a") (TVar "'a")),
          (VFFI (\x -> return $ x)))),
   ("+", ((TFun TInt (TFun TInt TInt)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x + y))))))]
+          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x + y)))))),
+  ("=", ((TFun TInt (TFun TInt TBool)),
+          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x == y))))))]
 
 exec :: Env -> String -> Either String (Type, Value)
 exec env src = do

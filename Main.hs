@@ -32,7 +32,9 @@ op ::: String
   = [+\-*/<>=:^~#$-]+
 |]
 
-main = runStateT mainloop (1, preludeEnv)
+main = do
+  putStrLn $ "hello. F2 v" ++ version ++ "\n"
+  runStateT mainloop (1, preludeEnv)
 
 mainloop :: StateT (Int, Env) IO ()
 mainloop = do
