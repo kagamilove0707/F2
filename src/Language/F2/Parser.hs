@@ -11,7 +11,7 @@ space :: ()
   = [ \r\n\t] { () } / comment { () }
 
 delimiter :: ()
-  = [()[\]<>;:,.+*/<>=:^~#$-] { () }
+  = [()\[\]<>;:,.+*/<>=:^~#$-'] { () }
 
 comment :: ()
   = '{-' (space / (!"-}" . { () }))* '-}' { () }
@@ -20,8 +20,7 @@ top :: AST
   = expr !.
 
 expr :: AST
-  = (letrecExpr / letExpr / funExpr / ifExpr / appExpr) ":" sig { Sig $1 $2 }
-  / letrecExpr / letExpr / funExpr / ifExpr / appExpr
+  = letrecExpr / letExpr / funExpr / ifExpr / appExpr
 
 letExpr :: AST
   = "let" name "=" expr "in" expr { Let $1 $2 $3 }
@@ -44,6 +43,7 @@ appExpr :: AST
 
 value :: AST
   = "(" expr ")"
+  / "(" expr ":" sig ")" { Sig $1 $2 }
   / "(" expr "," expr ")" { Tuple ($1, $2) }
   / "(" op ")" { Var $1 }
   / intValue { IntLit $1 }
@@ -74,7 +74,7 @@ boolValue ::: Bool
 
 name ::: String
   = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9~']* { $1 : $2 }
-  / '~' [a-zA-Z~']* { '~' : $1 }
+  / '~' [a-zA-Z~\']* { '~' : $1 }
 
 op ::: String
   = [.+\-*/<>^~#$] [.+\-*/<>^~#$=:]* { $1 : $2 }

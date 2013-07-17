@@ -34,6 +34,7 @@ instance Show Type where
   show TBool = "Bool"
   show (TTuple (t1, t2)) = "(" ++ show t1 ++ ", " ++ show t2 ++ ")"
   show (TVar s) = s
+  show (TFun t1@(TFun _ _) t2) = "(" ++ show t1 ++ ") -> " ++ show t2
   show (TFun t1 t2) = show t1 ++ " -> " ++ show t2
 
 data Value

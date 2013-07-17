@@ -9,7 +9,7 @@ import Language.F2.Eval
 
 import Control.Monad.Error
 
-version = "0.1.2.2 (2013/07/17)"
+version = "0.1.2.3 (2013/07/17)"
 
 defaultEnv :: Env
 defaultEnv = []

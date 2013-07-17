@@ -47,9 +47,9 @@ substTyEnv st env = map (\(s, t) -> (s, substTy st t)) env
 composeSubst :: TySubst -> TySubst -> TySubst
 composeSubst st2 st1 = foldl (\st (s, t) -> case lookup s st of
   Just _ -> st
-  Nothing -> (s, t):st) st2' st1
+  Nothing -> (s, t):st) st1' st2
   where
-  st2' = map (\(s, t) -> (s, substTy st1 t)) st2
+  st1' = map (\(s, t) -> (s, substTy st2 t)) st1
 
 newTVar :: StateT Int (Either String) Type
 newTVar = do
