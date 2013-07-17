@@ -23,12 +23,13 @@ expr :: AST
   = letrecExpr / letExpr / funExpr / ifExpr / opExpr
 
 letExpr :: AST
-  = "let" name "=" expr "in" expr { Let $1 $2 $3 }
-  / "let" "(" op ")" "=" expr "in" expr { Let $1 $2 $3 }
+  = "let" ("(" op ")" / name) name+ "=" expr "in" expr { Let $1 (foldr (\a e->Fun a e) $3 $2) $4 }
+  / "let" ("(" op ")" / name) "=" expr "in" expr { Let $1 $2 $3 }
+  / "let" name op name "=" expr "in" expr { Let $2 (Fun $1 (Fun $3 $4)) $5 }
 
 letrecExpr :: AST
-  = "let" "rec" name "=" funExpr "in" expr { LetRec $1 $2 $3 }
-  / "let" "rec" "(" op ")" "=" expr "in" funExpr { LetRec $1 $2 $3 }
+  = "let" "rec" ("(" op ")" / name) name+ "=" expr "in" expr { LetRec $1 (foldr (\a e->Fun a e) $3 $2) $4 }
+  / "let" "rec" name op name "=" expr "in" expr { LetRec $2 (Fun $1 (Fun $3 $4)) $5 }
 
 funExpr :: AST
   = "fun" name+ "->" expr { foldr (\a e->Fun a e) $2 $1 }
