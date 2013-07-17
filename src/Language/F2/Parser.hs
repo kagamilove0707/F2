@@ -38,7 +38,7 @@ ifExpr :: AST
   = "if" expr "then" expr "else" expr { If $1 $2 $3 }
 
 opExpr :: AST
-  = opExpr op appExpr { App (App (Var $2) $1) $3 }
+  = opExpr ("`" name "`" / op) appExpr { App (App (Var $2) $1) $3 }
   / appExpr
 
 appExpr :: AST
@@ -49,6 +49,8 @@ value :: AST
   = "(" expr ")"
   / "(" expr ":" sig ")" { Sig $1 $2 }
   / "(" expr "," expr ")" { Tuple ($1, $2) }
+  / "(" value ("`" name "`" / op) ")" { App (Var $2) $1 }
+  / "(" ("`" name "`" / op) value ")" { Fun "" (App (App (Var $1) (Var "")) $2) }
   / "(" op ")" { Var $1 }
   / intValue { IntLit $1 }
   / boolValue { BoolLit $1 }

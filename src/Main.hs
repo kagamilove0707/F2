@@ -42,8 +42,14 @@ op ::: String
   / [=:] [.+\-*/<>^~#$&|=:]+ { $1 : $2 }
 |]
 
+helloStr
+ = "    ____ _____\n" ++
+   "  //        //\n" ++
+   " //--   ----  \n" ++
+   "//     //___  version " ++ version ++ "\n"
+
 main = do
-  putStrLn $ "hello. F2 v" ++ version ++ "\n"
+  putStrLn $ helloStr
   runStateT mainloop (1, preludeEnv)
 
 mainloop :: StateT (Int, Env) IO ()
@@ -56,6 +62,7 @@ mainloop = do
     lift $ putStrLn "\n  See you!!"
   else if line == ":v" then do
     lift $ putStrLn $ "  version " ++ version
+    modify (first (+ 1))
     mainloop
   else do
     case parseString top "<source>" line of

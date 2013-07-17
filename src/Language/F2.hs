@@ -9,7 +9,7 @@ import Language.F2.Eval
 
 import Control.Monad.Error
 
-version = "0.1.3.0 (2013/07/17)"
+version = "0.1.3.2 20130718"
 
 defaultEnv :: Env
 defaultEnv = []
@@ -21,6 +21,7 @@ preludeEnv = [
   ("$", ap),
   (".", compose),
   ("flip", flip),
+  ("on", on),
   ("id", ((TFun (TVar "'a") (TVar "'a")),
          (VFFI (\x -> return $ x)))),
   ("~", ((TFun TInt TInt),
@@ -55,6 +56,7 @@ preludeEnv = [
   Right ap = exec [] "let ($) = fun f x -> f x in (($) : ('a -> 'b) -> 'a -> 'b)"
   Right flip = exec [] "let flip f y x = f x y in (flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c)"
   Right compose = exec [] "let f . g = fun x -> f (g x) in ((.) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c)"
+  Right on = exec [] "let on op f = fun x y -> f x `op` f y in (on : ('b -> 'b -> 'c) -> ('a -> 'b) -> 'a -> 'a -> 'c)"
 
 exec :: Env -> String -> Either String (Type, Value)
 exec env src = do
