@@ -13,6 +13,9 @@ import Text.Peggy (defaultDelimiter, peggy, parseString)
 space :: ()
   = [ \r\n\t] { () } / comment { () }
 
+delimiter :: ()
+  = [()\[\]<>;:,.+*/<>=:^~#$-'|&] { () }
+
 comment :: ()
   = '{-' (space / (!"-}" . { () }))* '-}' { () }
 
@@ -31,12 +34,14 @@ otherExpr :: String
   = .+
 
 name ::: String
-  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_~] [a-zA-Z0-9~']* { $1 : $2 }
+  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9~']* { $1 : $2 }
+  / [~]+ { $1 }
 
 op ::: String
-  = [.+\-*/<>^~#$] [.+\-*/<>^~#$=:]* { $1 : $2 }
-  / [=:] [.+\-*/<>^~#$=:]+ { $1 : $2 }
+  = [.+\-*/<>^~#$|&] [.+\-*/<>^~#$&|=:]* { $1 : $2 }
+  / [=:] [.+\-*/<>^~#$&|=:]+ { $1 : $2 }
 |]
+
 main = do
   putStrLn $ "hello. F2 v" ++ version ++ "\n"
   runStateT mainloop (1, preludeEnv)

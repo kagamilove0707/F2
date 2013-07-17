@@ -11,7 +11,7 @@ space :: ()
   = [ \r\n\t] { () } / comment { () }
 
 delimiter :: ()
-  = [()\[\]<>;:,.+*/<>=:^~#$-'] { () }
+  = [()\[\]<>;:,.+*/<>=:^~#$-'|&] { () }
 
 comment :: ()
   = '{-' (space / (!"-}" . { () }))* '-}' { () }
@@ -20,7 +20,7 @@ top :: AST
   = expr !.
 
 expr :: AST
-  = letrecExpr / letExpr / funExpr / ifExpr / appExpr
+  = letrecExpr / letExpr / funExpr / ifExpr / opExpr
 
 letExpr :: AST
   = "let" name "=" expr "in" expr { Let $1 $2 $3 }
@@ -36,9 +36,12 @@ funExpr :: AST
 ifExpr :: AST
   = "if" expr "then" expr "else" expr { If $1 $2 $3 }
 
+opExpr :: AST
+  = opExpr op appExpr { App (App (Var $2) $1) $3 }
+  / appExpr
+
 appExpr :: AST
   = appExpr value { App $1 $2}
-  / appExpr op appExpr { App (App (Var $2) $1) $3 }
   / value
 
 value :: AST
@@ -73,12 +76,12 @@ boolValue ::: Bool
   / "False" { False }
 
 name ::: String
-  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9~']* { $1 : $2 }
-  / '~' [a-zA-Z~\']* { '~' : $1 }
+  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9']* { $1 : $2 }
+  / [~]+ { $1 }
 
 op ::: String
-  = [.+\-*/<>^~#$] [.+\-*/<>^~#$=:]* { $1 : $2 }
-  / [=:] [.+\-*/<>^~#$=:]+ { $1 : $2 }
+  = [.+\-*/<>^~#$|&] [.+\-*/<>^~#$&|=:]* { $1 : $2 }
+  / [=:] [.+\-*/<>^~#$&|=:]+ { $1 : $2 }
 |]
 
 parse :: String -> Either String AST

@@ -9,13 +9,16 @@ import Language.F2.Eval
 
 import Control.Monad.Error
 
-version = "0.1.2.3 (2013/07/17)"
+version = "0.1.2.4 (2013/07/17)"
 
 defaultEnv :: Env
 defaultEnv = []
 
 preludeEnv :: Env
 preludeEnv = [
+  ("fix", fix),
+  ("const", const),
+  ("$", ap),
   ("id", ((TFun (TVar "'a") (TVar "'a")),
          (VFFI (\x -> return $ x)))),
   ("~", ((TFun TInt TInt),
@@ -39,7 +42,15 @@ preludeEnv = [
   ("<=", ((TFun TInt (TFun TInt TBool)),
           (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x <= y)))))),
   (">=", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x >= y))))))]
+          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x >= y)))))),
+  ("&&", ((TFun TBool (TFun TBool TBool)),
+          (VFFI (\(VBool x)-> return $ VFFI (\(VBool y)-> return $ VBool (x && y)))))),
+  ("||", ((TFun TBool (TFun TBool TBool)),
+          (VFFI (\(VBool x)-> return $ VFFI (\(VBool y)-> return $ VBool (x || y))))))]
+  where
+  Right fix = exec [] "(let rec fix = fun f x -> f (fix f) x in fix : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b)"
+  Right const = exec [] "let const = fun x y -> x in (const : 'a -> 'b -> 'a)"
+  Right ap = exec [] "let ($) = fun f x -> f x in (($) : ('a -> 'b) -> 'a -> 'b)"
 
 exec :: Env -> String -> Either String (Type, Value)
 exec env src = do
