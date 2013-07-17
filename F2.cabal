@@ -2,7 +2,7 @@
 -- see http://haskell.org/cabal/users-guide/
 
 name:                F2
-version:             0.1.2.0
+version:             0.1.2.2
 synopsis:            functional language 2
 description:         functional language 2
 homepage:            https://github.com/kagamilove0707/F2

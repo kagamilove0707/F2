@@ -34,9 +34,9 @@ name ::: String
   = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_~] [a-zA-Z0-9~']* { $1 : $2 }
 
 op ::: String
-  = [+\-*/<>=:^~#$-]+
+  = [.+\-*/<>^~#$] [.+\-*/<>^~#$=:]* { $1 : $2 }
+  / [=:] [.+\-*/<>^~#$=:]+ { $1 : $2 }
 |]
-
 main = do
   putStrLn $ "hello. F2 v" ++ version ++ "\n"
   runStateT mainloop (1, preludeEnv)
@@ -50,7 +50,7 @@ mainloop = do
   if line == ":q" then do
     lift $ putStrLn "\n  See you!!"
   else if line == ":v" then do
-    lift $ putStrLn "  version " ++ version
+    lift $ putStrLn $ "  version " ++ version
     mainloop
   else do
     case parseString top "<source>" line of

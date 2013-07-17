@@ -20,7 +20,8 @@ top :: AST
   = expr !.
 
 expr :: AST
-  = letrecExpr / letExpr / funExpr / ifExpr / appExpr
+  = (letrecExpr / letExpr / funExpr / ifExpr / appExpr) ":" sig { Sig $1 $2 }
+  / letrecExpr / letExpr / funExpr / ifExpr / appExpr
 
 letExpr :: AST
   = "let" name "=" expr "in" expr { Let $1 $2 $3 }
@@ -43,7 +44,6 @@ appExpr :: AST
 
 value :: AST
   = "(" expr ")"
-  / "(" expr ":" sig ")" { Sig $1 $2 }
   / "(" expr "," expr ")" { Tuple ($1, $2) }
   / "(" op ")" { Var $1 }
   / intValue { IntLit $1 }
@@ -77,7 +77,8 @@ name ::: String
   / '~' [a-zA-Z~']* { '~' : $1 }
 
 op ::: String
-  = [.+\-*/<>=:^#$-]+
+  = [.+\-*/<>^~#$] [.+\-*/<>^~#$=:]* { $1 : $2 }
+  / [=:] [.+\-*/<>^~#$=:]+ { $1 : $2 }
 |]
 
 parse :: String -> Either String AST
