@@ -19,6 +19,7 @@ preludeEnv = [
   ("fix", fix),
   ("const", const),
   ("$", ap),
+  (".", compose),
   ("flip", flip),
   ("id", ((TFun (TVar "'a") (TVar "'a")),
          (VFFI (\x -> return $ x)))),
@@ -53,6 +54,7 @@ preludeEnv = [
   Right const = exec [] "let const = fun x y -> x in (const : 'a -> 'b -> 'a)"
   Right ap = exec [] "let ($) = fun f x -> f x in (($) : ('a -> 'b) -> 'a -> 'b)"
   Right flip = exec [] "let flip f y x = f x y in (flip : ('a -> 'b -> 'c) -> 'b -> 'a -> 'c)"
+  Right compose = exec [] "let f . g = fun x -> f (g x) in ((.) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c)"
 
 exec :: Env -> String -> Either String (Type, Value)
 exec env src = do
