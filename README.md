@@ -88,18 +88,18 @@ $ ./f2
 let式にも（`let 名前 引数 = 本体 in 式`）という風にして関数を束縛できる糖衣構文がありますです＞ω＜　（おまけに演算子では（`let 引数1 記号 引数2 = 本体 in 式`）とも定義出来ますです＞ω＜）
 
 ```
-(13)# let rec fact x = if x <= 0 then 1 else x * fact (x - 1) in fact 5
+(12)# let rec fact x = if x <= 0 then 1 else x * fact (x - 1) in fact 5
   it = let rec fact = fun x -> if x <= 0 then 1 else x * fact (x - 1) in fact 5 = 120 : Int
-(14)# let rec x ^ y = if x == 0 then 1 else x * (x ^ (y - 1)) in 2 ^ 16
+(13)# let rec x ^ y = if x == 0 then 1 else x * (x ^ (y - 1)) in 2 ^ 16
   it = let rec x ^ y = if x == 0 then 1 else x * (x ^ (y - 1)) in 2 ^ 16 = 65536 : Int
 ```
 
 最後に、バージョン確認は`:v`、終了は`:q`で行えますです＞ω＜
 
 ```
-(15)# :v
+(14)# :v
   version 0.1.3.0
-(16)# :q
+(15)# :q
 
   See you!
 ```
