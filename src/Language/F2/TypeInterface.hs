@@ -24,13 +24,14 @@ unify eqs = solve eqs []
      (_, _) -> Left "type error : no match"
 
 occurs :: Type -> Type -> Bool
+occurs t1 (TTuple (t21, t22)) = occurs t1 t21 || occurs t1 t22
 occurs t1 (TFun t21 t22) = occurs t1 t21 || occurs t1 t22
 occurs t1 t2 = t1 == t2
 
 substTy :: TySubst -> Type -> Type
 substTy _ TInt = TInt
 substTy _ TBool = TBool
-substTy _ (TTuple x) = TTuple x
+substTy st (TTuple (x,y)) = TTuple (substTy st x, substTy st y)
 substTy st (TVar s) = f st s
   where
   f [] s' = TVar s'
@@ -83,6 +84,15 @@ tinf' env (IntLit _) = return (env, TInt, [])
 tinf' env (BoolLit _) = return (env, TBool, [])
 tinf' env (Var s) = case lookup s env of
   Just t@(TVar _) -> return (env, t, [])
+  Just t@(TTuple (TVar _,TVar _)) -> return (env, t, [])
+  Just (TTuple (tv@(TVar _), t)) -> do
+    t' <- incrTy t
+    modify (+ 1)
+    return (env, TTuple (tv, t'), [])
+  Just (TTuple (t,tv@(TVar _))) -> do
+    t' <- incrTy t
+    modify (+ 1)
+    return (env, TTuple (t',tv), [])
   Just t -> do
     t' <- incrTy t
     modify (+ 1)
@@ -102,13 +112,14 @@ tinf' env (App e1 e2) = do
   th3 <- lift $ unify [(t11, TFun t2 t3)]
   let t3' = substTy th3 t3
   let env''' = substTyEnv th3 env''
-  return (env''', t3', th3 +*+ th2 +*+ th1)
+  return (env''', t3', th3 +*+ (th2 +*+ th1))
   where
   (+*+) = composeSubst
 tinf' env (If c e1 e2) = do
   (env', tc, thc) <- tinf' env c
   thc' <- lift $ unify [(tc, TBool)]
   let env'' = substTyEnv thc' env'
+{-
   tv1 <- newTVar
   (env1, t1, th1) <- tinf' env'' e1
   (env2, t2, th2) <- tinf' env1 e2
@@ -116,7 +127,15 @@ tinf' env (If c e1 e2) = do
   let env2' = substTyEnv th3 env2
   let tv1' = substTy th3 tv1
   return (env2', tv1', th3 +*+ th2 +*+ thc')
+--}
+  (env1, t1, th1) <- tinf' env'' e1
+  (env2, t2, th2) <- tinf' env1 e2
+  th3 <- lift $ unify [(t1,t2)]
+  let env2' = substTyEnv th3 env2
+  let t1' = substTy th3 t1
+  return (env2', t1', th3 +*+ th2 +*+ th1 +*+ thc' +*+  thc)
   where
+  infixr 8 +*+
   (+*+) = composeSubst
 tinf' env (Let s e1 e2) = do
   (env', t1, th1) <- tinf' env e1

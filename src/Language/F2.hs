@@ -11,7 +11,7 @@ import Language.F2.Util
 import Control.Applicative
 import Control.Monad.Error
 
-version = "0.1.3.3 20130718"
+version = "0.1.3.4 20130718"
 
 defaultEnv :: Env
 defaultEnv = []
