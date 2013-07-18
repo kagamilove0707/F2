@@ -20,6 +20,7 @@ data AST
   | If AST AST AST
   | Let Name AST AST
   | LetRec Name AST AST
+  | Lazy AST
   | Sig AST Type deriving (Show)
 
 data Type
@@ -42,7 +43,8 @@ data Value
   | VBool Bool
   | VTuple (Value, Value)
   | VFun VEnv AST
-  | VFFI (Value -> StateT VEnv (Either String) Value)
+  | VFFI (Value -> Either String Value)
+  | VLazy VEnv AST
 
 instance Show Value where
   show (VInt x) = show x

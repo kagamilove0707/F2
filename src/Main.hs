@@ -70,7 +70,10 @@ mainloop = do
       Right (name, x) -> case exec env x of
         Left e -> lift $ putStrLn $ "  " ++ e
         Right (t, v) -> do
-          modify (second ((name, (t, v)):))
-          lift $ putStrLn $ "  " ++ name ++ " = " ++ x ++ " = " ++ show v ++ " : " ++ show t
+          case getValue v of
+            Left e -> lift $ putStrLn $ "  " ++ e
+            Right v' -> do
+              modify (second ((name, (t, v')):))
+              lift $ putStrLn $ "  " ++ name ++ " = " ++ x ++ " = " ++ show v' ++ " : " ++ show t
     modify (first (+ 1))
     mainloop

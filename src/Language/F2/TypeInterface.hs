@@ -14,6 +14,7 @@ unify eqs = solve eqs []
    |t1 == t2 = solve eqs th
    |otherwise = case (t1, t2) of
      (TFun t11 t12, TFun t21 t22) -> solve ((t11, t21):(t12, t22):eqs) th
+     (TTuple (t11, t12), TTuple (t21, t22)) -> solve ((t11, t21):(t12, t22):eqs) th
      (TVar s, _)
       |occurs t1 t2 -> Left "type error : occurs miss"
       |otherwise -> solve (substEq [(s, t2)] eqs) (composeSubst [(s, t2)] th)
@@ -139,5 +140,6 @@ tinf' env (LetRec s e1 e2) = do
   let env2 = substTyEnv th1' env''
   (env2', t2, th2) <- tinf' env2 e2
   return (remove s env2', t2, composeSubst th1' th2)
+tinf' env (Lazy ast) = tinf' env ast
 
 tinf env e = evalStateT (tinf' env e) 0

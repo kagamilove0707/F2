@@ -20,7 +20,7 @@ top :: AST
   = expr !.
 
 expr :: AST
-  = letrecExpr / letExpr / funExpr / ifExpr / opExpr
+  = letrecExpr / letExpr / funExpr / ifExpr / lazyExpr / opExpr
 
 letExpr :: AST
   = "let" ("(" op ")" / name) name+ "=" expr "in" expr { Let $1 (foldr (\a e->Fun a e) $3 $2) $4 }
@@ -36,6 +36,9 @@ funExpr :: AST
 
 ifExpr :: AST
   = "if" expr "then" expr "else" expr { If $1 $2 $3 }
+
+lazyExpr :: AST
+  = "lazy" expr { Lazy $1 }
 
 opExpr :: AST
   = opExpr ("`" name "`" / op) appExpr { App (App (Var $2) $1) $3 }
@@ -79,7 +82,7 @@ boolValue ::: Bool
   / "False" { False }
 
 name ::: String
-  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" [a-z_] [a-zA-Z0-9']* { $1 : $2 }
+  = !"fun" !"in" !"let" !"rec" !"if" !"then" !"else" !"lazy" [a-z_] [a-zA-Z0-9']* { $1 : $2 }
   / [~]+ { $1 }
 
 op ::: String

@@ -6,10 +6,12 @@ import Language.F2.DataType
 import Language.F2.Parser
 import Language.F2.TypeInterface
 import Language.F2.Eval
+import Language.F2.Util
 
+import Control.Applicative
 import Control.Monad.Error
 
-version = "0.1.3.2 20130718"
+version = "0.1.3.3 20130718"
 
 defaultEnv :: Env
 defaultEnv = []
@@ -27,30 +29,51 @@ preludeEnv = [
   ("~", ((TFun TInt TInt),
          (VFFI (\(VInt x)-> return $ VInt (negate x))))),
   ("+", ((TFun TInt (TFun TInt TInt)),
-         (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x + y)))))),
+         (op (+) VInt getInt getInt))),
   ("-", ((TFun TInt (TFun TInt TInt)),
-         (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x - y)))))),
+         (op (-) VInt getInt getInt))),
   ("*", ((TFun TInt (TFun TInt TInt)),
-         (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VInt (x * y)))))),
+         (op (*) VInt getInt getInt))),
   ("/", ((TFun TInt (TFun TInt TInt)),
-         (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> if y /= 0 then return $ VInt (x `div` y) else lift $ Left "exec error : 0 div"))))),
+         (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> if y /= 0 then return $ VInt (x `div` y) else throwError "exec error : 0 div"))))),
   ("==", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x == y)))))),
+          (op (==) VBool getInt getInt))),
   ("/=", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x /= y)))))),
+          (op (/=) VBool getInt getInt))),
   ("<", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x < y)))))),
+          (op (<) VBool getInt getInt))),
   (">", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x > y)))))),
+          (op (>) VBool getInt getInt))),
   ("<=", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x <= y)))))),
+          (op (<=) VBool getInt getInt))),
   (">=", ((TFun TInt (TFun TInt TBool)),
-          (VFFI (\(VInt x)-> return $ VFFI (\(VInt y)-> return $ VBool (x >= y)))))),
+          (op (>=) VBool getInt getInt))),
   ("&&", ((TFun TBool (TFun TBool TBool)),
-          (VFFI (\(VBool x)-> return $ VFFI (\(VBool y)-> return $ VBool (x && y)))))),
+          (VFFI $ \x-> return $ VFFI $ \y -> do
+            x' <- getBool x
+            if x'
+              then do
+                y' <- getBool y
+                return $ VBool y'
+              else return $ VBool False))),
   ("||", ((TFun TBool (TFun TBool TBool)),
-          (VFFI (\(VBool x)-> return $ VFFI (\(VBool y)-> return $ VBool (x || y))))))]
+                    (VFFI $ \x-> return $ VFFI $ \y -> do
+            x' <- getBool x
+            if x'
+              then return $ VBool True
+              else do
+                y' <- getBool y
+                return $ VBool y'))),
+  ("fst", ((TFun (TTuple (TVar "'a", TVar "'b")) (TVar "'a")),
+           (VFFI $ \x -> getTuple x >>= return . fst))),
+  ("snd", ((TFun (TTuple (TVar "'a", TVar "'b")) (TVar "'b")),
+           (VFFI $ \x -> getTuple x >>= return . snd)))]
   where
+  op :: (a -> b -> c) -> (c -> Value) -> (Value -> Either String a) -> (Value -> Either String b) -> Value
+  op f ret a1 a2 = (VFFI (\x-> return $ VFFI (\y-> do
+    x' <- a1 x
+    y' <- a2 y
+    return $ ret (f x' y'))))
   Right fix = exec [] "(let rec fix f x = f (fix f) x in fix : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b)"
   Right const = exec [] "let const = fun x y -> x in (const : 'a -> 'b -> 'a)"
   Right ap = exec [] "let ($) = fun f x -> f x in (($) : ('a -> 'b) -> 'a -> 'b)"
